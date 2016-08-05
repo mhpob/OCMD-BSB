@@ -22,6 +22,8 @@ vignettes/*.pdf
 # Misc docs
 *.pdf
 *.doc
+*.xlsx
+*.xls
 
 # Misc Folders
 Effects of Sound/
