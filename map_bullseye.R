@@ -1,25 +1,15 @@
 #### BSB DNR/BOEM ---------------------------------
+library(dplyr)
 met <- c(-74.753546, 38.352747)
 
-rec_loc <- data.frame(lat = c(38.15564, 38.14732, 38.14488,
-                              38.43768, 38.42872, 38.42619,
-                              38.23071, 38.22120, 38.21864),
-                      long = c(-74.94863, -74.93908, -74.95380,
-                               -74.77002, -74.75971, -74.77468,
-                               -74.75808, -74.74715, -74.76294),
-                      depth = c(71.2, 70, 71,
-                                86, 92, 87,
-                                76, 105, 89),
-                      site = rep(c('S1', 'S2', 'S3'), each = 3))
-
-rel_loc <- data.frame(lat = c(38.148047, 38.430944, 38.223683),
-                      long = c(-74.947197, -74.768028, -74.756183))
+sites <- read.csv('p:/obrien/biotelemetry/ocmd-bsb/log4map.csv')
 
 library(rgdal)
 blocks <- readOGR('c:/users/secor/desktop/gis products/md mammals/wind_planning_areas',
                   'Wind_Planning_Areas_06_20_2014')
 midatl <- readOGR('c:/users/secor/desktop/gis products/chesapeake/midatlantic',
                   'matl_states_land')
+
 # circ_500m <- TelemetryR::ptcirc(met, 500)
 # circ_1k <- TelemetryR::ptcirc(met, 1000)
 # circ_2k <- TelemetryR::ptcirc(met, 2000)
@@ -41,11 +31,13 @@ ggplot() +
   geom_polygon(data = midatl, aes(long, lat, group = group)) +
   coord_map(xlim = c(-75.22, -74.45), ylim = c(38.12, 38.56)) +
   geom_point(aes(x = met[1], y = met[2]), pch = 8) +
-  geom_point(data = rec_loc, aes(x = long, y = lat, color = site)) +
-  geom_point(data = rel_loc, aes(x = long, y = lat), color = 'black') +
+  geom_point(data = filter(sites, Type == 'Receiver'),
+             aes(x = Long, y = Lat, color = Site.ID, shape = Trip)) +
+  geom_point(data = filter(sites, Type == 'Tag'), aes(x = Long, y = Lat),
+             color = 'black') +
+  geom_point(data = filter(sites, Type == 'Fishing'),
+             aes(x = Long, y = Lat, shape = Trip)) +
   theme_bw() +
-  scale_color_discrete(breaks = c('S1', 'S3', 'S2'),
-                       labels = c('Outer', 'Middle', 'Inner')) +
   labs(x = 'Longitude', y = 'Latitude', color = '')
 
 # Export to Google Earth
