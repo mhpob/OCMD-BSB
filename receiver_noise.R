@@ -1,6 +1,6 @@
 library(lubridate); library(dplyr)
 
-log <- read.csv('p:/obrien/biotelemetry/ocmd-bsb/vue_export.csv',
+log <- read.csv('p:/obrien/biotelemetry/ocmd-bsb/receiver logs/vue_export.csv',
                 stringsAsFactors = F)
 log$Date.Time <- ymd_hms(log$Date.Time)
 log <- filter(log, grepl('depth|angle|temperature|noise', Description),
