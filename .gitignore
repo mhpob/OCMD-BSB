@@ -24,7 +24,10 @@ vignettes/*.pdf
 *.doc
 *.xlsx
 *.xls
+*.csv
 
 # Misc Folders
-Effects of Sound/
+Proposal/
 Purchasing/
+Receiver Logs/
+Reports/
