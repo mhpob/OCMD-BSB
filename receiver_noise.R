@@ -1,6 +1,6 @@
 library(lubridate); library(dplyr)
 
-log <- read.csv('p:/obrien/biotelemetry/ocmd-bsb/receiver logs/vue_export.csv',
+log <- read.csv('p:/obrien/biotelemetry/ocmd-bsb/vue_export.csv',
                 stringsAsFactors = F)
 log$Date.Time <- ymd_hms(log$Date.Time)
 log <- filter(log, grepl('depth|angle|temperature|noise', Description),
@@ -10,8 +10,20 @@ log <- filter(log, grepl('depth|angle|temperature|noise', Description),
 
 log$Data <- as.numeric(log$Data)
 
-log$array <- ifelse(grepl('01|08|09', log$Receiver), 'Inner',
-             ifelse(grepl('03|04|07', log$Receiver), 'Middle', 'Outer'))
+label <- function(x){
+  switch(x,
+         'VR2AR-546301' = 'Inner SW',
+         'VR2AR-546302' = 'Outer SW',
+         'VR2AR-546303' = 'Middle N',
+         'VR2AR-546304' = 'Middle SW',
+         'VR2AR-546305' = 'Outer N',
+         'VR2AR-546306' = 'Outer SE',
+         'VR2AR-546307' = 'Middle SE',
+         'VR2AR-546308' = 'Inner N',
+         'VR2AR-546309' = 'Inner SE')
+  }
+
+log$site <- sapply(log$Receiver, label)
 
 
 library(TelemetryR)
@@ -20,9 +32,9 @@ detects <- filter(detects,
                   date.local > ymd_hms('2016-06-12 23:50:00', tz = 'America/New_York'),
                   transmitter %in% paste0('A69-1601-', seq(44950, 44994, 1)))
 
-ten_ceiling <- function(x){
-  as.POSIXct(ceiling(as.numeric(x)/(10*60))*(10*60),
-           origin='1970-01-01', tz = 'UTC')}
+# ten_ceiling <- function(x){
+#   as.POSIXct(ceiling(as.numeric(x)/(10*60))*(10*60),
+#            origin='1970-01-01', tz = 'UTC')}
 
 # detects$agg.date <- ten_ceiling(detects$date.utc)
 detects$agg.date <- ceiling_date(detects$date.local, unit = 'hour')
