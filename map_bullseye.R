@@ -32,13 +32,14 @@ ggplot() +
   coord_map(xlim = c(-75.22, -74.45), ylim = c(38.12, 38.56)) +
   geom_point(aes(x = met[1], y = met[2]), pch = 8) +
   geom_point(data = filter(sites, Type == 'Receiver'),
-             aes(x = Long, y = Lat, color = Site.ID, shape = Trip)) +
+             aes(x = Long, y = Lat, color = Site.ID)) +
   geom_point(data = filter(sites, Type == 'Tag'), aes(x = Long, y = Lat),
              color = 'black') +
   geom_point(data = filter(sites, Type == 'Fishing'),
-             aes(x = Long, y = Lat, shape = Trip)) +
+             aes(x = Long, y = Lat)) +
   theme_bw() +
-  labs(x = 'Longitude', y = 'Latitude', color = '')
+  theme(legend.position = c(0.06, 0.9)) +
+  labs(x = 'Longitude', y = 'Latitude', color = 'Array')
 
 # Export to Google Earth
 TelemetryR::GEcircle(met[2], met[1], 500, 'red', F)
