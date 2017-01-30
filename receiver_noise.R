@@ -45,10 +45,27 @@ j <- distinct(detects, Receiver, transmitter, agg.date) %>%
 k <- summarize(j, n=n())
 
 library(ggplot2)
-temp.dat <- filter(log, Description == 'Average noise')
-ggplot() + geom_smooth(data = temp.dat,
+temp.dat <- filter(log, grepl('SE', site),
+                   Description == 'Average temperature' |
+                   Description == 'Maximum noise' & Data > 50 |
+                   Description == 'Tilt angle' & Data < 75)
+temp.dat$Description <- factor(temp.dat$Description,
+                               levels = c('Maximum noise', 'Tilt angle',
+                                          'Average temperature'))
+data_lab <- c(
+  'Average temperature' = 'Temperature (°C)',
+  'Maximum noise' = 'Ambient Noise (mV)',
+  'Tilt angle' = 'Tilt Angle (°)'
+)
+
+windows(11,7)
+ggplot() + geom_point(data = temp.dat,
                        aes(x = Date.Time, y = Data)) +
-  facet_wrap(~ Receiver, dir = 'v')
+  facet_grid(Description ~ site, scales = 'free_y',
+             labeller = labeller(Description = data_lab)) +
+  labs(x = 'Date', y = 'Value') +
+  theme_bw()
+savePlot('Noise_Tilt_Temp', 'bmp')
 
 ggplot() + geom_smooth(data = k,
                        aes(x = agg.date, y = n)) +
