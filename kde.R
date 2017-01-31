@@ -10,12 +10,21 @@ coa.bandw <- lapply(X = coa.list, FUN = Hpi)
 coa.kde <- lapply(X = names(coa.list),
                   FUN = function(i){kde(coa.list = coa.list[[i]],
                                         H = coa.bandw[[i]])})
+names(coa.kde) <- names(coa.list)
 
 # Plotting
-kde.plot <- contourLines(x = coa.kde[[1]]$eval.points[[1]],
-                         y = coa.kde[[1]]$eval.points[[2]],
-                         z = coa.kde[[1]]$estimate,
-                         levels = coa.kde[[1]]$cont['2%'])
+# lapply the contourLines code
+# will create a list of lists, each part referring to a single transmitter
+temporary.contour.function <- function(i){
+  contourLines(x = coa.kde[[i]]$eval.points[[1]],
+               y = coa.kde[[i]]$eval.points[[2]],
+               z = coa.kde[[i]]$estimate,
+               levels = coa.kde[[i]]$cont['5%'])
+  }
+
+testing <- lapply(names(coa.kde), temporary.contour.function)
+
+
 names(kde.plot) <- seq(1, length(kde.plot), 1)
 kde.plot <- lapply(kde.plot, data.frame)
 kde.plot <- do.call(rbind, kde.plot)
