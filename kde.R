@@ -1,4 +1,4 @@
-library(ks); library(dplyr)
+library(ks)
 load('data/coa.data.rda')
 
 # Calculate Kkernel density estimate (KDE)
@@ -8,13 +8,13 @@ coa.list <- split(as.data.frame(coa.data[, c('coa.long','coa.lat')]),
 coa.bandw <- lapply(X = coa.list, FUN = Hpi)
 
 coa.kde <- lapply(X = names(coa.list),
-                  FUN = function(i){kde(coa.list = coa.list[[i]],
+                  FUN = function(i){kde(x = coa.list[[i]],
                                         H = coa.bandw[[i]])})
 names(coa.kde) <- names(coa.list)
 
 # Plotting
 # lapply the contourLines code
-# will create a list of lists, each part referring to a single transmitter
+# will create a list (transmitters) of lists (Contour groups)
 temporary.contour.function <- function(i){
   contourLines(x = coa.kde[[i]]$eval.points[[1]],
                y = coa.kde[[i]]$eval.points[[2]],
@@ -22,16 +22,27 @@ temporary.contour.function <- function(i){
                levels = coa.kde[[i]]$cont['5%'])
   }
 
-testing <- lapply(names(coa.kde), temporary.contour.function)
+kde.plot <- lapply(names(coa.kde), temporary.contour.function)
 
+names(kde.plot) <- names(coa.list)
 
-names(kde.plot) <- seq(1, length(kde.plot), 1)
-kde.plot <- lapply(kde.plot, data.frame)
+for(i in seq(1, length(kde.plot), 1)){
+  names(kde.plot[[i]]) <- seq(1, length(kde.plot[[i]]), 1)
+  kde.plot[[i]] <- lapply(kde.plot[[i]], data.frame)
+}
+
+kde.plot <- lapply(names(kde.plot), function(i){do.call(rbind, kde.plot[[i]])})
+names(kde.plot) <- names(coa.list)
 kde.plot <- do.call(rbind, kde.plot)
-kde.plot$contour <- gsub("[.].*", "", row.names(kde.plot))
+
+kde.plot$transmitter <- gsub("[.].*", "", row.names(kde.plot))
+kde.plot$contour <- unlist(lapply(strsplit(row.names(kde.plot), "[.]"),
+                                      `[[`, 2))
+##ISSUE HERE!
+kde.plot$contour <- paste(kde.plot$transmitter, kde.plot$contour, collapse = '[.]')
 
 
 library(ggplot2)
 ggplot() +
   # geom_point(data=coa.list[[1]], aes(coa.long, coa.lat))+
-  geom_path(data=kde.plot, aes(x, y, group = contour))
+  geom_path(data=kde.plot, aes(x, y, group = contour, color = transmitter))
