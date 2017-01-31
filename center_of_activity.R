@@ -8,15 +8,15 @@ detects <- filter(detects, transmitter %in%
                         ifelse(grepl('Middle', station), 'Middle',
                                'Inner')))
 
-hold <- group_by(detects, transmitter, station, lat, long, agg.date, array) %>%
+coa.data <- group_by(detects, transmitter, station, lat, long, agg.date, array) %>%
   summarize(n = n()) %>%
   group_by(array, transmitter, agg.date) %>%
-  summarize(com.lat = sum(n*lat)/sum(n),
-            com.long = sum(n*long)/sum(n)) %>%
+  summarize(coa.lat = sum(n*lat)/sum(n),
+            coa.long = sum(n*long)/sum(n)) %>%
   arrange(transmitter, agg.date)
+# save(coa.data, file = 'data/coa.data.rda')
 
-
-test <- hold[hold$transmitter == 'A69-1601-44950',]
+test <- coa.data[coa.data$transmitter == 'A69-1601-44950',]
 j <- filter(detects, grepl('Outer', station)) %>% distinct(long, lat)
 
 library(ggplot2); library(animation)
@@ -25,7 +25,7 @@ base <- ggplot() +geom_point(data = j, aes(x = long, y = lat))
 
 saveHTML(
   for (i in 1:2838){
-    plot <- base + geom_point(data = test[i,], aes(x = com.long, y = com.lat),
+    plot <- base + geom_point(data = test[i,], aes(x = coa.long, y = coa.lat),
                               color = 'red', size = 5)
     print(plot)
     ani.pause()

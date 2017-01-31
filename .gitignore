@@ -27,11 +27,12 @@ vignettes/*.pdf
 *.csv
 
 # Misc Folders
+Cruises/
+Data/
 Proposal/
 Purchasing/
 Receiver Logs/
 Reports/
-Cruises/
 
 # Images
 *.bmp
