@@ -1,7 +1,8 @@
 library(ks)
 load('data/coa.data.rda')
+arrays <- unique(coa.data[, c('array', 'transmitter')])
 
-# Calculate Kkernel density estimate (KDE)
+# Calculate kernel density estimate (KDE)
 coa.list <- split(as.data.frame(coa.data[, c('coa.long','coa.lat')]),
                   as.factor(coa.data$transmitter))
 
@@ -40,7 +41,12 @@ kde.plot$contour <- unlist(lapply(strsplit(row.names(kde.plot), "[.]"),
 kde.plot$contour <- paste(kde.plot$transmitter, kde.plot$contour, sep = ':')
 row.names(kde.plot) <- NULL
 
+# Re-specify arrays
+kde.plot <- merge(kde.plot, arrays)
+
 library(ggplot2)
 ggplot() +
   # geom_point(data=coa.list[[1]], aes(coa.long, coa.lat))+
-  geom_path(data = kde.plot[1:1683,], aes(x, y, group = contour, color = transmitter))
+  geom_path(data = kde.plot, aes(x, y, group = contour, color = transmitter)) +
+  facet_wrap(~array, scales = 'free') +
+  guides(color = F)
