@@ -13,8 +13,7 @@ coa.kde <- lapply(X = names(coa.list),
 names(coa.kde) <- names(coa.list)
 
 # Plotting
-# lapply the contourLines code
-# will create a list (transmitters) of lists (Contour groups)
+# Create a list (transmitters) of lists (Contour groups)
 temporary.contour.function <- function(i){
   contourLines(x = coa.kde[[i]]$eval.points[[1]],
                y = coa.kde[[i]]$eval.points[[2]],
@@ -38,11 +37,10 @@ kde.plot <- do.call(rbind, kde.plot)
 kde.plot$transmitter <- gsub("[.].*", "", row.names(kde.plot))
 kde.plot$contour <- unlist(lapply(strsplit(row.names(kde.plot), "[.]"),
                                       `[[`, 2))
-##ISSUE HERE!
-kde.plot$contour <- paste(kde.plot$transmitter, kde.plot$contour, collapse = '[.]')
-
+kde.plot$contour <- paste(kde.plot$transmitter, kde.plot$contour, sep = ':')
+row.names(kde.plot) <- NULL
 
 library(ggplot2)
 ggplot() +
   # geom_point(data=coa.list[[1]], aes(coa.long, coa.lat))+
-  geom_path(data=kde.plot, aes(x, y, group = contour, color = transmitter))
+  geom_path(data = kde.plot[1:1683,], aes(x, y, group = contour, color = transmitter))
