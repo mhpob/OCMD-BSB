@@ -45,8 +45,28 @@ row.names(kde.plot) <- NULL
 kde.plot <- merge(kde.plot, arrays)
 
 library(ggplot2)
+# Array facets, colors = transmitters
 ggplot() +
-  # geom_point(data=coa.list[[1]], aes(coa.long, coa.lat))+
   geom_path(data = kde.plot, aes(x, y, group = contour, color = transmitter)) +
   facet_wrap(~array, scales = 'free') +
   guides(color = F)
+
+# Transmitter facets
+ggplot() +
+  geom_path(data = kde.plot, aes(x, y, group = contour)) +
+  facet_wrap(~transmitter, scales = 'free')
+
+# Points and contour by array
+array.pt.plot <- function(arr){
+  ggplot() +
+    geom_point(data = coa.data[grepl(arr, coa.data$array),],
+               aes(coa.long, coa.lat), size = 0.5, color = 'grey')+
+    geom_path(data = kde.plot[grepl(arr, kde.plot$array),],
+              aes(x, y, group = contour), color = 'red') +
+    facet_wrap(~transmitter) +
+    theme_bw()
+}
+
+array.pt.plot('Outer')
+array.pt.plot('Inner')
+array.pt.plot('Middle')
