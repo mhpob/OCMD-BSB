@@ -49,12 +49,9 @@ library(ggplot2)
 ggplot() +
   geom_path(data = kde.plot, aes(x, y, group = contour, color = transmitter)) +
   facet_wrap(~array, scales = 'free') +
-  guides(color = F)
-
-# Transmitter facets
-ggplot() +
-  geom_path(data = kde.plot, aes(x, y, group = contour)) +
-  facet_wrap(~transmitter, scales = 'free')
+  guides(color = F) +
+  labs(x = 'Latitude', y = 'Longitude') +
+  theme_bw()
 
 # Points and contour by array
 array.pt.plot <- function(arr){
@@ -64,6 +61,7 @@ array.pt.plot <- function(arr){
     geom_path(data = kde.plot[grepl(arr, kde.plot$array),],
               aes(x, y, group = contour), color = 'red') +
     facet_wrap(~transmitter) +
+    labs(title = arr, x = 'Latitude', y = 'Longitude') +
     theme_bw()
 }
 
