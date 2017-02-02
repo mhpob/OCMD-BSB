@@ -12,6 +12,11 @@ coa.bandw <- lapply(X = coa.list, FUN = function(x){
   tryCatch(Hpi(x), error = function(e){NULL})
   })
 coa.bandw <- coa.bandw[!sapply(coa.bandw, is.null)]
+if(length(coa.list) != length(coa.bandw)){
+  cat(paste('Transmitters did not converge.',
+        paste(setdiff(names(coa.list), names(coa.bandw)), collapse = ', '),
+        'dropped'))
+  }
 
 coa.kde <- lapply(X = names(coa.list),
                   FUN = function(i){kde(x = coa.list[[i]],
