@@ -15,12 +15,8 @@ coa.bandw <- coa.bandw[!sapply(coa.bandw, is.null)]
 if(length(coa.list) != length(coa.bandw)){
   cat(paste('Transmitters did not converge.',
         paste(setdiff(names(coa.list), names(coa.bandw)), collapse = ', '),
-<<<<<<< HEAD
         'dropped.'))
   coa.list <- coa.list[names(coa.bandw)]
-=======
-        'dropped'))
->>>>>>> e3963518b5a781cb958aa02e767ec2f052b53d57
   }
 
 coa.kde <- lapply(X = names(coa.list),
