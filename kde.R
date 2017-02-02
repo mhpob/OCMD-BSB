@@ -2,11 +2,16 @@ library(ks)
 load('data/coa.data.rda')
 arrays <- unique(coa.data[, c('array', 'transmitter')])
 
-# Calculate kernel density estimate (KDE)
+# Calculate kernel density estimate (KDE).
+## lapply with break if Hpi doesn't converge. Use tryCatch to set failures as
+##   NULL and move on to next set of detections.
 coa.list <- split(as.data.frame(coa.data[, c('coa.long','coa.lat')]),
                   as.factor(coa.data$transmitter))
 
-coa.bandw <- lapply(X = coa.list, FUN = Hpi)
+coa.bandw <- lapply(X = coa.list, FUN = function(x){
+  tryCatch(Hpi(x), error = function(e){NULL})
+  })
+coa.bandw <- coa.bandw[!sapply(coa.bandw, is.null)]
 
 coa.kde <- lapply(X = names(coa.list),
                   FUN = function(i){kde(x = coa.list[[i]],
