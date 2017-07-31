@@ -1,5 +1,5 @@
 library(readxl)
-tagdat <- read_excel('p:/obrien/biotelemetry/ocmd-bsb/data/taggingdata_ocbsb.xlsx')
+tagdat <- read_excel('p:/obrien/biotelemetry/ocmd-bsb/data/taggingdata_ocbsb_16.xlsx')
 
 library(ggplot2)
 ggplot() + geom_histogram(data = tagdat, aes(x = `Length\r\n(TL, mm)`))
@@ -40,10 +40,19 @@ surv.arr$pct <- surv.arr$num/15
 surv.all <- rbind(surv.all, surv.arr)
 
 ggplot() + geom_line(data = surv.all,
-                     aes(x = date, y = pct, col = array),
+                     aes(x = date, y = num, col = array),
                      lwd = 2) +
   scale_color_manual(values = c('black', 'red', 'blue', 'purple')) +
-  labs(x = 'Date', y = 'Percent remaining in array', color = 'Array') +
-  theme_bw()
+  labs(x = 'Date', y = 'Number remaining in array', color = 'Array') +
+  theme_bw() #+
 
 
+surv.all$doy <- yday(surv.all$date)
+lapply(unique(surv.all$array),
+       function(x) lm(num ~ doy,
+                      data = distinct(surv.all, array, num, .keep_all = T),
+                      subset = (array == x)))
+
+summary(lm(num ~ doy * array,
+         data =  distinct(surv.all, array, num, .keep_all = T),
+         subset = (array != 'All')))
