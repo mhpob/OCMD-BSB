@@ -56,10 +56,11 @@ ggplot() + geom_line(data = surv.all,
 
 
 surv.all$doy <- yday(surv.all$date)
-model_results <- lapply(unique(surv.all$array),
+model_results <- sapply(levels(surv.all$array),
        function(x) summary(lm(num ~ doy,
                       data = distinct(surv.all, array, num, .keep_all = T),
-                      subset = (array == x))))
+                      subset = (array == x))),
+       simplify = F, USE.NAMES = T)
 
 anova(lm(num ~ doy + array,
          data =  distinct(surv.all, array, num, .keep_all = T),
