@@ -3,13 +3,12 @@ library(lubridate); library(dplyr)
 log <- read.csv('p:/obrien/biotelemetry/ocmd-bsb/vue_export.csv',
                 stringsAsFactors = F)
 log$Date.Time <- ymd_hms(log$Date.Time)
-log <- filter(log, grepl('depth|angle|temperature|noise', Description),
+log <- log %>%
+  filter(grepl('Tilt|Average [depth|angle|temperature|noise]', Description),
               Date.Time > '2016-06-12',
               Date.Time < '2016-12-31') %>%
-  mutate(Date.Time = ceiling_date(Date.Time, unit = 'hour'))
-
-
-log$Data <- as.numeric(log$Data)
+  mutate(Date.Time = ceiling_date(Date.Time, unit = 'hour'),
+         Data = as.numeric(Data))
 
 label <- function(x){
   switch(x,
