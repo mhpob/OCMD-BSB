@@ -4,7 +4,8 @@ log <- read.csv('p:/obrien/biotelemetry/ocmd-bsb/vue_export.csv',
                 stringsAsFactors = F)
 log$Date.Time <- ymd_hms(log$Date.Time)
 log <- filter(log, grepl('depth|angle|temperature|noise', Description),
-              Date.Time > ymd_hms('2016-06-12 23:59:59')) %>%
+              Date.Time > '2016-06-12',
+              Date.Time < '2016-12-31') %>%
   mutate(Date.Time = ceiling_date(Date.Time, unit = 'hour'))
 
 
@@ -29,7 +30,8 @@ log$site <- sapply(log$Receiver, label)
 library(TelemetryR)
 detects <- vemsort('p:/obrien/biotelemetry/ocmd-bsb/receiver logs')
 detects <- filter(detects,
-                  date.local > ymd_hms('2016-06-12 23:50:00', tz = 'America/New_York'),
+                  date.local > '2016-06-12',
+                  date.local < '2016-12-31',
                   transmitter %in% paste0('A69-1601-', seq(44950, 44994, 1)))
 
 # ten_ceiling <- function(x){
