@@ -32,7 +32,8 @@ inset <- ggplot() +
   geom_polygon(data = far.f, aes(long, lat, group = group), fill = NA, color ='black') +
   coord_map(xlim = c(-77, -68), ylim = c(35.25, 41.5)) +
   # geom_point(aes(x = met[1], y = met[2]), pch = 23, bg = 'black') +
-  geom_path(data = hermine, aes(x = Lon, y = Lat), lwd = 2) +
+  geom_path(data = hermine, aes(x = Lon, y = Lat, color = VMAX), lwd = 1.25) +
+  scale_color_continuous(low = 'blue', high = 'red') +
   annotate('segment', lwd = 0.5,
            x = -75, xend = -74.5,
            y = 38.402, yend = 38.302) +
@@ -42,7 +43,8 @@ inset <- ggplot() +
   #            aes(x = Long, y = Lat), lwd = 0.1) +
   geom_point(data = filter(sites, Type == 'Tag'), aes(x = Long, y = Lat), lwd = 0.1) +
   theme_void() +
-  theme(plot.background = element_rect(color = 'black'))
+  theme(plot.background = element_rect(color = 'black'),
+        legend.position = 'none')
 inset
 
 study <- ggplot() +
