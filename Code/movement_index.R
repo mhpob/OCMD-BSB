@@ -35,8 +35,8 @@ dets <- dets[, c('transmitter', 'date', 'm.index')]
 
 library(ggplot2)
 
-ggplot() + geom_point(data = dets, aes(x = date, y = m.index)) +
-  facet_wrap(~transmitter)
+# ggplot() + geom_point(data = dets, aes(x = date, y = m.index)) +
+#   facet_wrap(~transmitter)
 
 
 
@@ -88,3 +88,22 @@ move.cons <- lm(avg.move ~ h.event +
                 data = hermine_dets)
 summary(move.cons)
 anova(move.cons)
+
+# Manuscript box plots ----
+pre_post <- ggplot() +
+  geom_boxplot(data = hermine_dets, aes(x = h.event, y = avg.move)) +
+  labs(x = NULL, y = 'Movement Index') +
+  lims(y = c(0, 16.19)) +
+  theme_bw()
+
+go_stay <- ggplot() +
+  geom_boxplot(data = filter(hermine_dets,
+                             grepl('Evac|Remain', hermine.exit),
+                             h.event == 'Pre'),
+               aes(x = hermine.exit, y = avg.move)) +
+  labs(x = NULL, y = NULL) +
+  lims(y = c(0, 16.19)) +
+  theme_bw()
+
+library(gridExtra)
+grid.arrange(pre_post, go_stay, nrow = 1)
