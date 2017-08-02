@@ -6,13 +6,16 @@ sites <- sites %>%
                     ifelse(Site.ID == 'Inner', 'Northern', 'Middle')),
          array = ordered(array, levels = c('Northern', 'Middle', 'Southern')))
 
+hermine <- read.csv('data/hermine_track.csv', stringsAsFactors = F) %>%
+  mutate(date = lubridate::ymd_hms(date))
+
 library(rgeos); library(rgdal)
 close <- readOGR('c:/users/secor/desktop/gis products/chesapeake/midatlantic',
-                  'matl_states_land')
+                 'matl_states_land')
 far <- readOGR('c:/users/secor/desktop/gis products/natural earth/10m coastline',
              'ne_10m_land')
 far <- spTransform(far, CRS(proj4string(close)))
-plot(far, xlim = c(-80, -72), ylim = c(32, 42),col='red')
+plot(far, xlim = c(-80, -67), ylim = c(35, 42),col='red')
 mem.crop <- cbind(c(-80, -80, -70, -70, -80), c(33, 42, 42, 33, 33))
 mem.crop <- SpatialPolygons(list(Polygons(list(Polygon(mem.crop)),
                                           'Things I want to keep')),
@@ -27,8 +30,9 @@ far.f <- fortify(mem.crop)
 # Need to add in MAB inset w/ rect annotation
 inset <- ggplot() +
   geom_polygon(data = far.f, aes(long, lat, group = group), fill = NA, color ='black') +
-  coord_map(xlim = c(-77, -72), ylim = c(35.25, 41.5)) +
+  coord_map(xlim = c(-77, -68), ylim = c(35.25, 41.5)) +
   # geom_point(aes(x = met[1], y = met[2]), pch = 23, bg = 'black') +
+  geom_path(data = hermine, aes(x = Lon, y = Lat), lwd = 2) +
   annotate('segment', lwd = 0.5,
            x = -75, xend = -74.5,
            y = 38.402, yend = 38.302) +
@@ -62,7 +66,7 @@ library(grid)
 v1 <- viewport(width = 1, height = 1,
                x = 0.5, y = 0.5) #plot area for the main map
 v2 <- viewport(width = 0.3, height = 0.3,
-               x = 0.9, y = 0.825) #plot area for the inset map
+               x = 0.85, y = 0.825) #plot area for the inset map
 grid.newpage()
 print(study, vp = v1)
 print(inset, vp = v2)
