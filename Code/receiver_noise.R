@@ -1,38 +1,19 @@
 library(lubridate); library(dplyr)
 
-log <- read.csv('p:/obrien/biotelemetry/ocmd-bsb/vue_export.csv',
-                stringsAsFactors = F)
-log$Date.Time <- ymd_hms(log$Date.Time)
+log <- readRDS('data/bsb_events.rds')
 log <- log %>%
   filter(grepl('Tilt|Average [depth|angle|temperature|noise]', Description),
               Date.Time >= '2016-06-13',
               Date.Time < '2016-12-31') %>%
-  mutate(Date.Time = ceiling_date(Date.Time, unit = 'hour'),
+  mutate(Date.Time = ceiling_date(Date.Time, unit = 'day'),
          Data = as.numeric(Data))
 
-label <- function(x){
-  switch(x,
-         'VR2AR-546301' = 'Inner SW',
-         'VR2AR-546302' = 'Outer SW',
-         'VR2AR-546303' = 'Middle N',
-         'VR2AR-546304' = 'Middle SW',
-         'VR2AR-546305' = 'Outer N',
-         'VR2AR-546306' = 'Outer SE',
-         'VR2AR-546307' = 'Middle SE',
-         'VR2AR-546308' = 'Inner N',
-         'VR2AR-546309' = 'Inner SE')
-  }
-
-log$site <- sapply(log$Receiver, label)
-log$array <- ifelse(grepl('Inner', log$site), 'Northern',
-                    ifelse(grepl('Outer', log$site), 'Southern', 'Middle'))
-log$array <- ordered(log$array, levels = c('Northern', 'Middle', 'Southern'))
 
 log <- log %>%
-  group_by(Date.Time, array, Description) %>%
+  group_by(Date.Time, Array, Description) %>%
   summarize(value = mean(Data)) %>%
   ungroup() %>%
-  mutate(array = ordered(array, levels = c('Northern', 'Middle', 'Southern')))
+  mutate(array = ordered(Array, levels = c('Northern', 'Middle', 'Southern')))
 
 # library(TelemetryR)
 # detects <- vemsort('p:/obrien/biotelemetry/ocmd-bsb/receiver logs')
@@ -73,6 +54,15 @@ ggplot() + geom_point(data = plot.dat,
   facet_grid(Description ~ array, scales = 'free_y',
              labeller = labeller(Description = data_lab)) +
   labs(x = 'Date', y = 'Value') +
+  scale_x_datetime(date_breaks = '1 month',
+                   date_labels = '%b') +
+  # Hourly "zoomed" plot
+  # scale_x_datetime(limits = c(ymd_hms('2016-09-01 00:00:00'),
+  #                             ymd_hms('2016-09-07 23:59:59')),
+  #                  breaks = as.POSIXct(c('2016-09-01', '2016-09-03',
+  #                                        '2016-09-05', '2016-09-07'),
+  #                                      tz = 'UTC'),
+  #                  date_labels = '%m/%d') +
   theme_bw()
 savePlot('Noise_Tilt_Temp', 'bmp')
 
