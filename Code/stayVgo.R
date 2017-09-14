@@ -35,3 +35,10 @@ ggplot() + geom_histogram(data = tagdat,
   theme(legend.position = c(0.9, 0.5))
 
 
+# Evac ~ Length/Weight AOV
+tagdat.subset <- tagdat %>%
+  filter(hermine != 'Removed') %>%
+  mutate(hermine = factor(hermine))
+
+summary(lm(`Weight (kg)` ~ hermine, data = tagdat.subset))
+
