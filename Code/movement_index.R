@@ -76,7 +76,7 @@ ggplot() +
              binwidth = 0.25) +
   theme(legend.position = c(0.9, 0.75))
 
-# Contrasts
+# Contrasts ----
 fate.cons <- lm(log1p(avg.move) ~ hermine.exit +
                  `Release Array`, subset = (h.event == 'Pre'),
                 data = hermine_dets)
@@ -107,3 +107,31 @@ go_stay <- ggplot() +
 
 library(gridExtra)
 grid.arrange(pre_post, go_stay, nrow = 1)
+
+
+# Check movement v TL/Weight ----
+tl.wt.dat <- tagdat %>%
+  filter(!is.na(Transmitter)) %>%
+  left_join(hermine_dets,
+                  by = c('Transmitter' = 'transmitter',
+                         'Release Array' = 'Release Array')) %>%
+  select(Transmitter, `Length\r\n(TL, mm)`, `Weight (kg)`, h.event,
+         hermine.exit, avg.move)
+
+
+summary(lm(avg.move ~ `Length\r\n(TL, mm)`,
+           subset = (h.event == 'Pre'),
+           data = tl.wt.dat))
+
+summary(lm(avg.move ~ `Length\r\n(TL, mm)`,
+           subset = (h.event == 'Post'),
+           data = tl.wt.dat))
+
+summary(lm(avg.move ~ `Weight (kg)`,
+           subset = (h.event == 'Pre'),
+           data = tl.wt.dat))
+
+summary(lm(avg.move ~ `Weight (kg)`,
+           subset = (h.event == 'Post'),
+           data = tl.wt.dat))
+
