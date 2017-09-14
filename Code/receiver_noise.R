@@ -3,14 +3,14 @@ library(lubridate); library(dplyr)
 log <- readRDS('data/bsb_events.rds')
 log <- log %>%
   filter(grepl('Tilt|Average [depth|angle|temperature|noise]', Description),
-              Date.Time >= '2016-06-13',
-              Date.Time < '2016-12-31') %>%
-  mutate(Date.Time = ceiling_date(Date.Time, unit = 'day'),
+              Date.Time.Local >= '2016-06-13',
+              Date.Time.Local < '2016-12-31') %>%
+  mutate(Date.Time.Local = ceiling_date(Date.Time.Local, unit = 'hour'),
          Data = as.numeric(Data))
 
 
 log <- log %>%
-  group_by(Date.Time, Array, Description) %>%
+  group_by(Date.Time.Local, Array, Description) %>%
   summarize(value = mean(Data)) %>%
   ungroup() %>%
   mutate(array = ordered(Array, levels = c('Northern', 'Middle', 'Southern')))
@@ -42,29 +42,42 @@ plot.dat <- filter(log,
 plot.dat$Description <- ordered(plot.dat$Description,
                                levels = c('Average temperature',
                                           'Average noise', 'Tilt angle'))
+
 data_lab <- c(
   'Average temperature' = 'Temperature (°C)',
   'Average noise' = 'Ambient Noise (mV)',
   'Tilt angle' = 'Tilt Angle (°)'
 )
-
-windows(11,7)
-ggplot() + geom_point(data = plot.dat,
-                       aes(x = Date.Time, y = value)) +
-  facet_grid(Description ~ array, scales = 'free_y',
+#
+# windows(11,7)
+ggplot() + geom_line(data = plot.dat,
+                       aes(x = Date.Time.Local, y = value), pch = 18) +
+  facet_grid(Description ~ array, scales = 'free_y', switch = 'y',
              labeller = labeller(Description = data_lab)) +
-  labs(x = 'Date', y = 'Value') +
+  labs(x = 'Date', y = NULL) +
   scale_x_datetime(date_breaks = '1 month',
                    date_labels = '%b') +
   # Hourly "zoomed" plot
-  # scale_x_datetime(limits = c(ymd_hms('2016-09-01 00:00:00'),
-  #                             ymd_hms('2016-09-07 23:59:59')),
-  #                  breaks = as.POSIXct(c('2016-09-01', '2016-09-03',
-  #                                        '2016-09-05', '2016-09-07'),
-  #                                      tz = 'UTC'),
-  #                  date_labels = '%m/%d') +
-  theme_bw()
-savePlot('Noise_Tilt_Temp', 'bmp')
+  scale_x_datetime(limits = c(ymd_hms('2016-09-02 00:00:00'),
+                              ymd_hms('2016-09-07 23:59:59')),
+                   breaks = as.POSIXct(c('2016-09-03',
+                                         '2016-09-05', '2016-09-07'),
+                                       tz = 'UTC'),
+                   date_labels = '%m/%d') +
+  theme_bw() +
+  theme(strip.background = element_blank(),
+        strip.placement = 'outside',
+        strip.text = element_text(size = 11))
+# savePlot('Noise_Tilt_Temp', 'bmp')
+
+ggplot() + geom_line(data = filter(plot.dat, Description == 'Average temperature'),
+                     aes(x = Date.Time.Local, y = value)) +
+  facet_wrap(~ array) +
+  labs(x = 'Date', y = 'Temperature (°C)') +
+  scale_x_datetime(date_breaks = '1 month',
+                   date_labels = '%b') +
+  theme_bw() +
+  theme(strip.background = element_rect(fill = NA))
 
 ggplot() + geom_smooth(data = k,
                        aes(x = agg.date, y = n)) +
