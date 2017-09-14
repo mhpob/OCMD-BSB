@@ -92,7 +92,7 @@ anova(move.cons)
 # Manuscript box plots ----
 pre_post <- ggplot() +
   geom_boxplot(data = hermine_dets, aes(x = h.event, y = avg.move)) +
-  labs(x = NULL, y = 'Movement Index') +
+  labs(x = NULL, y = 'Activity Index') +
   lims(y = c(0, 16.19)) +
   theme_bw()
 
