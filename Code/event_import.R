@@ -8,6 +8,8 @@ Nov16_May17 <- read.csv(
 bsb_events <- rbind(Jun16_Nov16, Nov16_May17)
 
 bsb_events$Date.Time <- lubridate::ymd_hms(bsb_events$Date.Time)
+bsb_events$Date.Time.Local <- lubridate::with_tz(bsb_events$Date.Time,
+                                                 tzone = 'America/New_York')
 
 label <- function(x){
   switch(x,
@@ -30,8 +32,11 @@ bsb_events$array <- ifelse(grepl('In', bsb_events$site), 'Northern',
 bsb_events$array <- ordered(bsb_events$array,
                             levels = c('Northern', 'Middle', 'Southern'))
 
-names(bsb_events) <- c('Date.Time', 'Receiver', 'Description', 'Data', 'Units',
-                       'Site', 'Array')
+bsb_events <- bsb_events[, c('Date.Time', 'Date.Time.Local', 'Receiver',
+                             'Description', 'Data', 'Units', 'site', 'array')]
+
+names(bsb_events) <- c('Date.Time', 'Date.Time.Local', 'Receiver',
+                       'Description', 'Data', 'Units', 'Site', 'Array')
 
 
 saveRDS(bsb_events, file = 'data/bsb_events.rds')
