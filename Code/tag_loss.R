@@ -44,15 +44,18 @@ surv.all <- rbind(surv.all, surv.arr)
 surv.all$array <- ordered(surv.all$array,
                           levels = c('All', 'Northern', 'Middle', 'Southern'))
 
-ggplot() + geom_line(data = surv.all,
+ggplot() + geom_line(data = surv.arr,
                      aes(x = date, y = num, col = array),
-                     lwd = 2) +
-  scale_color_manual(values = c('black', 'red', 'blue', 'purple')) +
-  labs(x = 'Date', y = 'Fish remaining in array', color = 'Array') +
+                     lwd = 1) +
+  scale_color_manual(values = c('red', 'blue', 'purple')) +
+  geom_vline(xintercept = as.numeric(as.Date('2016-09-02')),
+             linetype = 5) +
+  geom_vline(xintercept = as.numeric(as.Date('2016-09-06')),
+             linetype = 5) +
+  labs(x = 'Date', y = 'Fish remaining in array', color = 'Site') +
   scale_x_date(date_breaks = '1 month', date_labels = '%b', minor_breaks = NULL) +
   theme_bw() +
-  theme(legend.position = c(0.9, 0.8),
-        legend.background = element_rect(color = 'black'))
+  theme(legend.position = 'none')
 
 
 surv.all$doy <- yday(surv.all$date)
