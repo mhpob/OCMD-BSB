@@ -1,6 +1,6 @@
 library(TelemetryR); library(lubridate); library(dplyr)
 
-detects <- vemsort('p:/obrien/biotelemetry/ocmd-bsb/receiver logs')
+detects <- readRDS('data/bsb_detections.rds')
 detects <- filter(detects, transmitter %in%
                     paste0('A69-1601-', seq(44950, 44994, 1))) %>%
   mutate(agg.date = ceiling_date(date.local, unit = 'hour'),

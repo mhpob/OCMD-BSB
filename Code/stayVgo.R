@@ -7,7 +7,7 @@ ggplot() + geom_histogram(data = tagdat, aes(x = `Length\r\n(TL, mm)`)) +
   labs(x = 'Total Length (mm)', y = 'Count')
 
 
-source('p:/obrien/biotelemetry/ocmd-bsb/code/bsb_detection_import.R')
+bsb.detects <- readRDS('data/bsb_detections.rds')
 
 library(dplyr)
 max.date <- filter(bsb.detects, grepl('Inn|Out|Mid', station),

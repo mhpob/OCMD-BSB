@@ -1,7 +1,7 @@
 library(TelemetryR); library(lubridate); library(dplyr)
 
 ## Data munging ----
-source('p:/obrien/biotelemetry/ocmd-bsb/code/bsb_detection_import.R')
+bsb.detects <- readRDS('data/bsb_detections.rds')
 
 dets <- bsb.detects %>%
   filter(date.utc <= '2016-12-31') %>%

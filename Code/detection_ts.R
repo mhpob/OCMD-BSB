@@ -1,5 +1,5 @@
 library(TelemetryR); library(ggplot2); library(lubridate); library(dplyr)
-detects <- vemsort('P:/OBrien/Biotelemetry/Detections/Offshore MD/BSB Noise Impact')
+detects <- readRDS('data/bsb_detections.rds')
 detects <- filter(detects,
                   transmitter %in%
                     paste0('A69-1601-', seq(44950, 44994, 1)),
