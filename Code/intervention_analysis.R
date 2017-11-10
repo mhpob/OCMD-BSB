@@ -4,6 +4,7 @@ detects <- readRDS('data/bsb_detections.rds')
 detects <- filter(detects,
                   transmitter %in%
                     paste0('A69-1601-', seq(44950, 44994, 1)),
+                  grepl('Inner|Outer|Middle', station),
                   date.local <= '2016-12-31',
                   date.local >= '2016-06-12') %>%
   mutate(agg.date = floor_date(date.local, unit = 'day'),
@@ -18,12 +19,12 @@ date.fill <- data.frame(agg.date = rep(seq(as.Date('2016-06-12'),
                                        each = 3),
                         array = ordered(rep(c('Northern', 'Middle', 'Southern'),
                                             times = 203),
-                                        levels = c('Northern', 'Middle', 'Southern')),
+                                  levels = c('Northern', 'Middle', 'Southern')),
                         stringsAsFactors = F)
 date.fill$agg.date <- ymd(date.fill$agg.date, tz = 'America/New_York')
 
 detect.ts <- detects %>%
-  distinct(transmitter, array, agg.date, .keep_all =T) %>%
+  distinct(transmitter, array, agg.date, .keep_all = T) %>%
   group_by(array, agg.date) %>%
   summarize(n = n()) %>%
   full_join(date.fill) %>%
@@ -33,7 +34,7 @@ detect.ts <- detects %>%
 
 
 library(tsoutliers)
-outliers2 <- sapply(levels(detect.ts$array),
+outliers <- sapply(levels(detect.ts$array),
        function(z){
          temporary <- filter(detect.ts, array == z) %>%
            arrange(agg.date)
