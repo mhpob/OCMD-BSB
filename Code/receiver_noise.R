@@ -50,7 +50,7 @@ data_lab <- c(
 )
 #
 # windows(11,7)
-ggplot() + geom_line(data = plot.dat,
+ggplot() + geom_point(data = plot.dat,
                        aes(x = Date.Time.Local, y = value), pch = 18) +
   facet_grid(Description ~ array, scales = 'free_y', switch = 'y',
              labeller = labeller(Description = data_lab)) +
@@ -67,13 +67,14 @@ ggplot() + geom_line(data = plot.dat,
   theme_bw() +
   theme(strip.background = element_blank(),
         strip.placement = 'outside',
-        strip.text = element_text(size = 11))
+        strip.text = element_text(size = 11),
+        axis.title = element_text(family = 'helvetica'))
 # savePlot('Noise_Tilt_Temp', 'bmp')
 
 ggplot() + geom_line(data = filter(plot.dat, Description == 'Average temperature'),
                      aes(x = Date.Time.Local, y = value)) +
   facet_wrap(~ array) +
-  labs(x = 'Date', y = 'Temperature (°C)') +
+  labs(x = 'Date', y = 'Temperature (°C)', fontface = 'bold') +
   scale_x_datetime(date_breaks = '1 month',
                    date_labels = '%b') +
   theme_bw() +
