@@ -44,19 +44,21 @@ surv.all <- rbind(surv.all, surv.arr)
 surv.all$array <- ordered(surv.all$array,
                           levels = c('All', 'Northern', 'Middle', 'Southern'))
 
-ggplot() + geom_line(data = surv.arr,
+manu.plot <- ggplot() + geom_line(data = surv.arr,
                      aes(x = date, y = num, col = array),
-                     lwd = 1) +
-  scale_color_manual(values = c('red', 'blue', 'purple')) +
+                     lwd = 0.5) +
+  scale_color_manual(values = c('red', 'green', 'purple')) +
   geom_vline(xintercept = as.numeric(as.Date('2016-09-02')),
              linetype = 5) +
   geom_vline(xintercept = as.numeric(as.Date('2016-09-06')),
              linetype = 5) +
-  labs(x = 'Date', y = 'Fish remaining in array', color = 'Site') +
+  labs(x = NULL, y = 'Fish remaining in array', color = 'Site') +
   scale_x_date(date_breaks = '1 month', date_labels = '%b', minor_breaks = NULL) +
   theme_bw() +
-  theme(legend.position = 'none')
-
+  theme(legend.position = 'none', axis.text = element_text(color = 'black'),
+        panel.grid = element_blank())
+ggsave('tagloss_NOGRID.eps', manu.plot, device = 'eps',
+       width = 85, height = 45.05, units = 'mm')
 
 surv.all$doy <- yday(surv.all$date)
 model_results <- sapply(levels(surv.all$array),

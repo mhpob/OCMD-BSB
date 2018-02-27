@@ -6,14 +6,11 @@ log <- log %>%
               Date.Time.Local >= '2016-06-13',
               Date.Time.Local < '2016-12-31') %>%
   mutate(Date.Time.Local = ceiling_date(Date.Time.Local, unit = 'hour'),
-         Data = as.numeric(Data))
-
-
-log <- log %>%
+         Data = as.numeric(Data)) %>%
   group_by(Date.Time.Local, Array, Description) %>%
   summarize(value = mean(Data)) %>%
   ungroup() %>%
-  mutate(array = ordered(Array, levels = c('Northern', 'Middle', 'Southern')))
+  mutate(Array = ordered(Array, levels = c('Northern', 'Middle', 'Southern')))
 
 # library(TelemetryR)
 # detects <- vemsort('p:/obrien/biotelemetry/ocmd-bsb/receiver logs')
@@ -50,11 +47,12 @@ data_lab <- c(
 )
 #
 # windows(11,7)
-ggplot() + geom_point(data = plot.dat,
-                       aes(x = Date.Time.Local, y = value), pch = 18) +
-  facet_grid(Description ~ array, scales = 'free_y', switch = 'y',
+manu.plot <- ggplot() +
+  geom_point(data = plot.dat,
+             aes(x = Date.Time.Local, y = value), pch = 18, size = 0.5) +
+  facet_grid(Description ~ Array, scales = 'free_y', switch = 'y',
              labeller = labeller(Description = data_lab)) +
-  labs(x = 'Date', y = NULL) +
+  labs(x = NULL, y = NULL) +
   scale_x_datetime(date_breaks = '1 month',
                    date_labels = '%b') +
   # Hourly "zoomed" plot
@@ -67,9 +65,10 @@ ggplot() + geom_point(data = plot.dat,
   theme_bw() +
   theme(strip.background = element_blank(),
         strip.placement = 'outside',
-        strip.text = element_text(size = 11),
+        strip.text = element_text(size = 9),
         axis.title = element_text(family = 'helvetica'))
-# savePlot('Noise_Tilt_Temp', 'bmp')
+ggsave('hrlyzoom.eps', manu.plot, device = 'eps',
+       width = 170, height = 95.66, units = 'mm')
 
 ggplot() + geom_line(data = filter(plot.dat, Description == 'Average temperature'),
                      aes(x = Date.Time.Local, y = value)) +
@@ -80,6 +79,26 @@ ggplot() + geom_line(data = filter(plot.dat, Description == 'Average temperature
   theme_bw() +
   theme(strip.background = element_rect(fill = NA))
 
+
+plot.dat.day <- plot.dat %>%
+  mutate(Date.Time.Local = ceiling_date(Date.Time.Local, unit = 'day')) %>%
+  group_by(Date.Time.Local, Array, Description) %>%
+  summarize(value = mean(value))
+
+manu.plot <- ggplot() +
+  geom_line(data = filter(plot.dat.day,
+                          Description == 'Average temperature'),
+            aes(x = Date.Time.Local, y = value, color = Array), lwd = 0.5) +
+  labs(x = NULL, y = 'Temperature (°C)', fontface = 'bold') +
+  scale_color_manual(values = c('red', 'green', 'purple')) +
+  scale_x_datetime(date_breaks = '1 month',
+                   date_labels = '%b') +
+  theme_bw() +
+  theme(legend.position = 'none', axis.text = element_text(color = 'black'),
+        panel.grid = element_blank())
+ggsave('dailytemp.eps', manu.plot, device = 'eps',
+       width = 85, height = 45.05, units = 'mm')
+
 ggplot() + geom_smooth(data = k,
                        aes(x = agg.date, y = n)) +
   facet_wrap(~ Receiver, dir = 'v')
@@ -88,6 +107,3 @@ ggplot() + geom_smooth(data = k,
 test <- left_join(temp.dat, k, by = c("Receiver", "Date.Time" = "agg.date"))
 ggplot() + geom_point(data = filter(test, Data > 50), aes(Data, n)) +
   labs(x = 'Noise', y = 'Detections')
-
-
-
