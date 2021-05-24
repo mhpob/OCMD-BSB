@@ -6,7 +6,7 @@ sites <- sites %>%
                     ifelse(Site.ID == 'Inner', 'Northern', 'Middle')),
          array = ordered(array, levels = c('Northern', 'Middle', 'Southern')))
 
-hermine <- read.csv('data/hermine_track.csv', stringsAsFactors = F) %>%
+hermine <- read.csv('p:/obrien/biotelemetry/ocmd-bsb/data/hermine_track.csv', stringsAsFactors = F) %>%
   mutate(date = lubridate::ymd_hms(date))
 
 library(rgeos); library(rgdal)
